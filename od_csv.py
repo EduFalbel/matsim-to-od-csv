@@ -8,8 +8,8 @@ import click
 @click.argument('trips_filename', type=click.Path(exists=True))
 @click.argument('zones_filename', type=click.Path(exists=True))
 @click.option('--zone-id-col', default='ID', help='ID column in the zones shapefile')
-@click.option('--out_filepath', default='od_matrix.csv', help='Filename for the csv output')
-def create_od(trips_filename, zones_filename, zone_id_col):
+@click.option('--out_filename', default='od_matrix.csv', help='Filename for the csv output')
+def create_od(trips_filename, zones_filename, zone_id_col, out_filename):
     trips = pd.read_csv(trips_filename)
 
     # Filter trips which use public transport
@@ -33,7 +33,7 @@ def create_od(trips_filename, zones_filename, zone_id_col):
     # Aggregate trips by start and end zones
     zones_with_volumes = trips.groupby([f"{zone_id_col}_start", f"{zone_id_col}_end"]).count().iloc[:, 0].reset_index().rename({f"{zone_id_col}_start" : "FROM", f"{zone_id_col}_end": "TO", trips.columns[0]: "DEMAND"})
 
-    zones_with_volumes.to_csv('od_matrix.csv', index=False)
+    zones_with_volumes.to_csv(out_filename, index=False)
 
 if __name__ == '__main__':
     create_od()
